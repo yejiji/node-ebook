@@ -2,9 +2,11 @@ const express = require('express')
 const mysql = require('mysql')
 const app = express()
 const constant = require('./const')
+const cors = require('cors')
 app.get('/',(req, res) => {
     res.send(new Date().toDateString())
 })
+app.use(cors())
 
 function connect() {
     return mysql.createConnection({
@@ -42,15 +44,10 @@ function randomArray(n, l) {
 
 function createData(results, key) {
     const data = results[key]
-    if (!data.cover.startsWith('http://')) {
-        data['cover'] = `${constant.resUrl}/img${data.cover}`
-    }
-    data['selected'] = false
-    data['private'] = false
-    data['cache'] = false
-    data['haveRead'] = false
-    return data
+    return handleData(data)
 }
+
+
 function createGuessYouLike(data) {
     const n = parseInt(randomArray(1, 3)) + 1
     switch (n) {
@@ -121,7 +118,7 @@ app.get('/book/home',(req, res) => {
     conn.query('select * from book where cover != \'\'', (err,results) => {
         const length = results.length
         const guessYouLike = []
-        const banner = ''
+        const banner = constant.resUrl + '/home_banner2.jpg'
         const recommend = []
         const featured = []
         const random = []
@@ -271,6 +268,7 @@ app.get('/book/home',(req, res) => {
         })
         randomArray(1, length).forEach(key => {
             random.push(createData(results,key))
+
         })
         res.json({
             guessYouLike,
