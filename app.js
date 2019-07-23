@@ -11,8 +11,8 @@ app.use(cors())
 function connect() {
     return mysql.createConnection({
         host: 'localhost',
-        user: '',
-        password: '',
+        user: 'root',
+        password: '1234',
         database: 'book'
     })
 }
@@ -281,6 +281,94 @@ app.get('/book/home',(req, res) => {
         })
         conn.end()
     })
+})
+
+app.get('/book/detail', (req, res) => {
+  const conn = connect()
+  const fileName = req.query.fileName
+  const sql = `select * from book where fileName='${fileName}'`
+  conn.query(sql, (err, results) => {
+    if (err) {
+      res.json({
+        error_code: 1,
+        msg: '电子书详情获取失败'
+      })
+    } else {
+      if (results && results.length === 0) {
+        res.json({
+          error_code: 1,
+          msg: '电子书详情获取失败'
+        })
+      } else {
+        const book = handleData(results[0])
+        res.json({
+          error_code: 0,
+          msg: '获取成功',
+          data: book
+        })
+
+      }
+    } 
+    conn.end()
+  })
+})
+
+app.get('/book/list', (req, res) => {
+  const conn = connect()
+  conn.query('select * from book where cover!=\'\'',
+    (err, results) => {
+      if (err) {
+        res.json({
+          error_code: 1,
+          msg: '获取失败'
+        })
+      } else {
+        results.map(item => handleData(item))
+        const data = {}
+        constant.category.forEach(categoryText => {
+          data[categoryText] = results.filter(item => item.categoryText === categoryText)
+        })
+        res.json({
+          error_code: 0,
+          msg: '获取成功',
+          data: data,
+          total: results.length
+        })
+      }
+      conn.end()
+    })
+})
+
+app.get('/book/flat-list', (req, res) => {
+  const conn = connect()
+  conn.query('select * from book where cover!=\'\'',
+    (err, results) => {
+      if (err) {
+        res.json({
+          error_code: 1,
+          msg: '获取失败'
+        })
+      } else {
+        results.map(item => handleData(item))
+        res.json({
+          error_code: 0,
+          msg: '获取成功',
+          data: results,
+          total: results.length
+        })
+      }
+      conn.end()
+    })
+})
+
+app.get('/book/shelf', (req, res) => {
+  res.json({
+    bookList: []
+  })
+})
+
+app.get('/voice', (req, res) => {
+  voice(req, res)
 })
 
 const server = app.listen(3000,() => {
