@@ -1,4 +1,5 @@
 const resUrl = 'http://localhost:8089'
+mp3FilePath = 'E:/webpic/resource/mp3'
 const category = [
     'Biomedicine',
     'BusinessandManagement',
@@ -26,5 +27,6 @@ const category = [
   
 module.exports = {
     resUrl,
-    category
+    category,
+    mp3FilePath
 }

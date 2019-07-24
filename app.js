@@ -3,6 +3,7 @@ const mysql = require('mysql')
 const app = express()
 const constant = require('./const')
 const cors = require('cors')
+const voice = require('./voice')
 app.get('/',(req, res) => {
     res.send(new Date().toDateString())
 })
